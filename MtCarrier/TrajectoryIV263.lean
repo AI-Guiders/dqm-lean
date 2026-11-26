@@ -261,14 +261,17 @@ theorem a7_quarter_disk_step_invariant
   have _hPrev := polar_relative_phase_invariant d curr 0 phiImp
   rfl
 
-/-- Because `wrap512 3 a` depends only on `a % N_ring 3`, the Pauli predicate `pauliPredicate d`
-is strictly invariant under `polarStepCell d`. -/
-theorem wrap512_congr_mod512_d3 (a b : Int) (h : a % (nRing 3 : Int) = b % (nRing 3 : Int)) :
-    wrap512 3 a = wrap512 3 b := by
+/-- Because `wrap512 3 a` depends only on `a % N_ring 3`, `a % N_ring 3 = b % N_ring 3 ↔ wrap512 3 a = wrap512 3 b` (`0 Prop premises`). -/
+theorem wrap512_congr_mod512_d3 (a b : Int) :
+    a % (nRing 3 : Int) = b % (nRing 3 : Int) ↔ wrap512 3 a = wrap512 3 b := by
   unfold wrap512
   dsimp [phiPauli, nRing, modBits, nTriangles] at *
-  have h2 : (256 - a) % 512 = (256 - b) % 512 := by omega
-  rw [h2]
+  constructor
+  · intro h
+    have h2 : (256 - a) % 512 = (256 - b) % 512 := by omega
+    rw [h2]
+  · intro h
+    omega
 
 theorem pauli_predicate_time_invariant
     (d : Nat) (curr : PolarCell) (pastPhi0 phiImp : Int) :
@@ -283,7 +286,7 @@ theorem pauli_predicate_time_invariant
   have hw : wrap512 3 ((polarStepCell 3 curr (coherentPastCell curr pastPhi0) phiImp).1.phi1 -
                        (polarStepCell 3 curr (coherentPastCell curr pastPhi0) phiImp).1.phi0) =
             wrap512 3 (curr.phi1 - curr.phi0) :=
-    wrap512_congr_mod512_d3 _ _ hphi
+    (wrap512_congr_mod512_d3 _ _).mp hphi
   rw [hmu0, hmu1, hw]
 
 /-- Unwrapped stationary-gate recursion starting from rest (`φ(0) = φ(-1) = phi0`):

@@ -9,6 +9,7 @@ package «dqm-lean» where
 lean_lib «RotatorCalculusPaper» where
   srcDir := "Constructive"
   roots := #[
+    `AxiomGuard,
     `RotatorQuadrature,
     `LogicCohomology,
     `PillaiDiophantine,

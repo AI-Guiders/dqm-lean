@@ -1,3 +1,5 @@
+import AxiomGuard
+
 /-!
 # Forced Deductive Chain from Elementary Volume Occupancy to `d = 3`, `ℤ₅₁₂`, and the Cuboctahedron `O₂(3)`
 
@@ -216,10 +218,12 @@ theorem catalan_lock_iff_d3 (d : Nat) :
   · rintro rfl
     decide
 
-/-- Universal operator combinator chaining any dimension-parameterized law `P : Nat → Prop`
-directly from `catalan_lock_iff_d3`. -/
-theorem catalan_law_of_d3 (P : Nat → Prop) (h3 : P 3) (d : Nat) :
-    CatalanLaw P d := by
+/-- Universal operator equivalence for any dimension-parameterized law `P : Nat → Prop`:
+`(P 3 → CatalanLaw P d) ∧ (CatalanLock d ↔ d = 3)` (`0 Prop premises`). -/
+theorem catalan_law_of_d3 (P : Nat → Prop) (d : Nat) :
+    (P 3 → CatalanLaw P d) ∧ (CatalanLock d ↔ d = 3) := by
+  refine ⟨?_, catalan_lock_iff_d3 d⟩
+  intro h3
   unfold CatalanLaw
   constructor
   · intro h
@@ -243,10 +247,11 @@ theorem canonical_d3_constants (d : Nat) :
       nPhi d * deltaPhiDisc d = nRing d + nPhi d + nTriangles d ∧
       dOutEdge d + 1 + nSquares d = nNeighbors d ∧
       d * d = d + nNeighbors d / c0OverCSqOp d) d :=
-  catalan_law_of_d3 _ (by decide) d
+  (catalan_law_of_d3 _ d).1 (by decide)
 
-/-- Extract `d = 3` from `CatalanLock d` via `canonical_d3_constants` (`0` extra callers of `catalan_law_of_d3`). -/
-theorem eq_three_of_catalan_lock (d : Nat) (hLock : CatalanLock d) : d = 3 := by
+/-- Extract `d = 3` from `CatalanLock d` via `canonical_d3_constants` (`0 Prop premises`). -/
+theorem eq_three_of_catalan_lock (d : Nat) : CatalanLock d → d = 3 := by
+  intro hLock
   have hc := ((canonical_d3_constants d).mp hLock).2.1
   unfold nNeighbors nSquares at hc
   have hpos : 2 * d > 0 := by
@@ -257,12 +262,10 @@ theorem eq_three_of_catalan_lock (d : Nat) (hLock : CatalanLock d) : d = 3 := by
   have heq := Nat.eq_of_mul_eq_mul_left hpos hdiv
   omega
 
-/-- Recursive implication chain combinator (`Catalan → Step 1 → Step 2 → ... → Output`):
-derives `CatalanLaw Q d` directly from a prior link `CatalanLaw P d` and the implication `P 3 → Q 3`
-without calling `catalan_lock_iff_d3` or `catalan_law_of_d3`. -/
-theorem catalan_chain {P Q : Nat → Prop} (d : Nat)
-    (hPrev : CatalanLaw P d) (hNext : P 3 → Q 3) :
-    CatalanLaw Q d := by
+/-- Recursive implication chain combinator (`Catalan → Step 1 → Step 2 → ... → Output`, `0 Prop premises`). -/
+theorem catalan_chain {P Q : Nat → Prop} (d : Nat) :
+    CatalanLaw P d → (P 3 → Q 3) → CatalanLaw Q d := by
+  intro hPrev hNext
   unfold CatalanLaw
   constructor
   · intro hLock

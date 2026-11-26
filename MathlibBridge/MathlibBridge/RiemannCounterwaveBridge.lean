@@ -32,6 +32,6 @@ theorem constructive_minkowski_sl2_counterwave_zero_bridge
     (pR = qR ↔ delta = 0) ∧
     (counterwaveInterferenceIntensity q pR qR (projCQ q dphi) = 0 ↔
       (delta = 0 ∧ pauliPhaseDistNat q dphi = 0)) :=
-  unconditional_minkowski_sl2_cascade_riemann_zero_iff R q c0 s0 delta dphi hq hc0 hProdMinus hPRPos hQRPos
+  cond_minkowski_sl2_cascade_single_mode_zero_iff R q c0 s0 delta dphi hq hc0 hProdMinus hPRPos hQRPos
 
 end DqmMathlibBridge

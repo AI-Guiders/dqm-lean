@@ -1,4 +1,4 @@
-import MtCarrier.ReversibleCalculus
+import MtCarrier.HardwarePhotovoltaics
 
 /-!
 # Nonlinear Mechanics & Elasticity on `O₂(d) × ℤ_{N_ring(d)}`: Coupled Elastic Pendulum at Arbitrary Angles, Four-Regime Spring Elasticity Beyond Hooke's Law, and Cyclic Metal Fatigue / Burgers Dislocation Nucleation (`0 sorryAx`, `0 Classical.choice`, `0 Prop premises`)

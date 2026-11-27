@@ -1,7 +1,12 @@
 import MtCarrier.ContinuumPhysics
-import MtCarrier.BioCosmology
+import MtCarrier.CosmologyHalo
+import MtCarrier.ChemicalBonding
+import MtCarrier.OntogenyMutagenesis
+import MtCarrier.PlanetogenesisAllometry
 import MtCarrier.NuclearShells
-import MtCarrier.ParticleMaterials
-import MtCarrier.ReversibleCalculus
+import MtCarrier.ParticleSpectrum
+import MtCarrier.SuperconductorBioCad
+import MtCarrier.ReversibleComputing
+import MtCarrier.RotatorQuadratureCarrier
 import MtCarrier.HardwarePhotovoltaics
 import MtCarrier.MechanicsElasticity

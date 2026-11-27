@@ -1,4 +1,4 @@
-import MtCarrier.BioCosmology
+import MtCarrier.PlanetogenesisAllometry
 
 set_option maxRecDepth 200000
 set_option maxHeartbeats 1000000

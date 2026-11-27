@@ -4,3 +4,4 @@ import MtCarrier.NuclearShells
 import MtCarrier.ParticleMaterials
 import MtCarrier.ReversibleCalculus
 import MtCarrier.HardwarePhotovoltaics
+import MtCarrier.MechanicsElasticity

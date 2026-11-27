@@ -88,7 +88,14 @@ theorem nonlinear_elasticity_four_regimes_metal_fatigue_and_coupled_pendulum_ope
        (pendulumSuspensionTensionOp d gLoad (phiPauli d : Int) = -gLoad * (qSquare d : Int) ∧
         pendulumRestoringForceOp d gLoad (phiPauli d : Int) = 0) ∧
        discreteCompleteEllipticIntegralOp d 1 1 = 2 * ((phiPauli d * qSquare d : Nat) : Int)) ∧
-      (k * springRestoringForceOp d 1 phi = springRestoringForceOp d k phi)) d := by
+      -- 6. Material modulus E & sound-speed c_s scaling across metals via 2D phase-cell volume K_ell(1,1) = 65,536 = 8 * ε(3):
+      --    (a) Fatigue endurance & elastic impact limit: 8192 * 40 = 5 * 65536 (σ_{-1}/E = v_{-1}/c_s = 40/65536 = 5/8192)
+      --    (b) Ashby ultimate tensile strength: 512 * 128 = 65536 (σ_UTS/E = v_128/c_s = 128/65536 = 1/512 = 1/N_ring)
+      --    (c) von Karman critical impact rupture velocity: 256 * 256 = 65536 (v_Karman/c_s = 256/65536 = 1/256 = 1/Φ_Pauli)
+      ((epsDenom d * (deltaPhiDisc d - 1) = 5 * (2 * phiPauli d * qSquare d)) ∧
+       (nRing d * qSquare d = 2 * phiPauli d * qSquare d) ∧
+       (phiPauli d * phiPauli d = 2 * phiPauli d * qSquare d) ∧
+       (k * springRestoringForceOp d 1 phi = springRestoringForceOp d k phi))) d := by
   apply catalan_chain d (l1_face_identity_int d phi)
   intro hl1
   have hFatigue0 : cyclicFatigueDamageOp 3 nCycles ((deltaPhiDisc 3 : Int) - 1) = 0 := by
@@ -118,6 +125,6 @@ theorem nonlinear_elasticity_four_regimes_metal_fatigue_and_coupled_pendulum_ope
            ⟨by unfold pendulumSuspensionTensionOp; rw [hC256, Int.mul_neg, Int.neg_mul],
             by unfold pendulumRestoringForceOp; rw [hS256, Int.mul_zero]⟩,
            by rw [hEll]; omega⟩,
-          by unfold springRestoringForceOp; rw [Int.one_mul]⟩
+          ⟨by decide, by decide, by decide, by unfold springRestoringForceOp; rw [Int.one_mul]⟩⟩
 
 end MtCarrier

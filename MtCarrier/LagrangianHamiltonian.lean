@@ -4,16 +4,14 @@ set_option maxRecDepth 200000
 set_option maxHeartbeats 1000000
 
 /-!
-# World-Field Lagrangian `ℒ_world`, Hamiltonian `ℋ_world`, Worldline Potential-Denominator Balance, and Time-Derivative Tower (`D_t^1, D_t^2, D_t^3`) (`0 sorryAx`, `0 Classical.choice`, `0 Prop premises`)
+# World-Field Lagrangian `ℒ_world`, Hamiltonian `ℋ_world`, 13-Node Causal Star `𝒞₁₃` Denominator Decomposition, and Time-Derivative Tower (`D_t^1, D_t^2, D_t^3`) (`0 sorryAx`, `0 Classical.choice`, `0 Prop premises`)
 
 This module formalizes the 3D World-Field Lagrangian and Hamiltonian densities
 along the 3D world evolution operator `Ψ^{(t+1)} = 𝒢_d(Ψ^{(t)})` (`fieldStepOp d` in `WorldTrajectory.lean`),
-together with the local amplitude weight `M(x)² ∈ [1, 4096]`, the gate denominator `D_raw(x, t)`, and the time-derivative tower:
-1. **Cell Amplitude Weight (`M(x)² ∈ [1, 4096]`) and Gate Denominator `D_raw(x, t)`:**
-   - At any 3D lattice point `x = (dz, dy, dx) ∈ ℤ³`, a cell has amplitude `M(x) = s.mu(dz, dy, dx)` (equal to `μ_vac(3) = 1` in empty vacuum outside the radius-6 ball e.g. `(7,0,0)`,
-     `N_φ(3) = 13` inside the `IV(3)` nucleation ball e.g. `(2,2,2)` where `M(x)² = 169`, and up to `K_P(3) = 64` where `M(x)² = 4,096`).
-   - Its raw gate denominator in `D_t^2 φ = ⌊K_P * z_drive / D_c(x)⌋` is
-     `D_raw,c(Ψ)(x) = 𝒵_real,c(Ψ)(x) + Q_□(d) * M(x)² + ε(d)`.
+together with the 13-node causal star `𝒞₁₃ = {0} ∪ O₂(d)` decomposition of `D_raw(x, t)` and the time-derivative tower:
+1. **13-Node Causal Star `𝒞₁₃ = {0} ∪ O₂(d)` Decomposition of the Gate Denominator `D_raw(x, t)`:**
+   - The central node `e = 0` (`Δφ₀ = 0`) has odd projection `M(x)² * S_d(0) = 0` and even projection `M(x)² * C_d(0) = Q_□(d) * M(x)²`.
+   - Therefore, `𝒵_imag^{𝒞₁₃}(x) = 𝒵_imag^{O₂}(x)` and `D_raw,c(Ψ)(x) = 𝒵_real^{𝒞₁₃}(x) + ε(d)`.
 2. **3D World-Field Lagrangian `ℒ_world` & Hamiltonian `ℋ_world` Densities:**
    - Temporal kinetic energy density weighted by `M(x)²`:
      `𝒯_time,c(Ψ)(x) = M(x)² * (Q_□(d) - C_d((P_c(x) - Q_c(x)) % N_ring(d))) ≥ 0`.
@@ -23,14 +21,8 @@ together with the local amplitude weight `M(x)² ∈ [1, 4096]`, the gate denomi
      World-Field Hamiltonian density `ℋ_world,c(Ψ)(x) = 𝒯_time,c(Ψ)(x) + 𝒰_grad,c(Ψ)(x)`.
 3. **Worldline Potential-Denominator Balance (`𝒰_grad(x, t) + D_raw(x, t) ≡ const(t)`):**
    - At every spatial node `x ∈ ℤ³` and across all time ticks `t ∈ ℕ` of the 3D world evolution `Ψ^{(t)} = 𝒢_d^[t](Ψ^{(0)})`,
-     the sum of the 12-ray gradient potential `𝒰_grad,c` and the raw gate denominator `D_raw,c` is
-     strictly independent of the phase fields `P_c, Q_c` and strictly invariant in time:
      `𝒰_grad,c(Ψ^{(t)})(x) + D_raw,c(Ψ^{(t)})(x) ≡ Q_□(d) * M(x) * (Σ_μ(x) + M(x)) + ε(d)`.
-4. **Mass-Weighted Closed-Form Parabola Hamiltonian `ℋ_parab(t) ≡ 0`, Tetrahedral Action `3 * ∑_{t=0}^N ℒ_parab(t) = M_eff * Φ₀² * N(N+1)(N+2)`, and Time-Derivative Tower (`D_t^1, D_t^2, D_t^3`):**
-   - Along the closed-form parabola `φ(t) = φ(0) + (t(t+1)/2) * Φ₀` for a cell of arbitrary inertial mass `mEff`,
-     the time-symmetric kinetic energy `T(t) = mEff * v_-(t) * v_+(t) / 2` and work potential `U(t) = -mEff * Φ₀ * (φ(t) - φ(0))`
-     satisfy exact Hamiltonian conservation `T(t) + U(t) ≡ 0` at every tick `t ∈ ℕ`, while the Lagrangian action over `N` ticks
-     equals the exact tetrahedral formula `3 * ∑_{t=0}^N (T(t) - U(t)) = mEff * Φ₀² * N * (N + 1) * (N + 2)`.
+4. **Mass-Weighted Closed-Form Parabola Hamiltonian `ℋ_parab(t) ≡ 0`, Tetrahedral Action `3 * ∑_{t=1}^N ℒ_parab(t) = M_eff * Φ₀² * N(N+1)(N+2)`, and Time-Derivative Tower (`D_t^1, D_t^2, D_t^3`).**
 -/
 
 namespace MtCarrier
@@ -50,54 +42,6 @@ def fieldTemporalKineticOp (d : Nat) (muFn pFn qFn : Int → Int → Int → Int
 def fieldSpatialPotentialOp (d : Nat) (muFn pFn : Int → Int → Int → Int) (dz dy dx : Int) : Int :=
   gateDeficitOp d (muFn dz dy dx) (fieldSumMuOp d muFn dz dy dx) (fieldZrOp d muFn pFn dz dy dx)
 
-/-- Exact first-quadrant inverse `atanL1FirstQuadOp(d, S, C) = (Q_□(d) * S) / (|C| + |S|)` of `(C_d(φ), S_d(φ))` on the `L¹` diamond:
-recovers `φ` with **zero approximation error** for every `φ ∈ [0, Q_□(d)]` and any positive homogeneous scaling `λ ≥ 1`. -/
-def atanL1FirstQuadOp (d : Nat) (sVal cVal : Int) : Int :=
-  ((qSquare d : Int) * sVal).tdiv ((cVal.natAbs : Int) + (sVal.natAbs : Int))
-
-/-- Exact full-ring inverse `atan2L1RingOp(d, S, C) ∈ [0, N_ring(d))` of `(C_d(φ), S_d(φ))` across all 4 quadrants of `ℤ_{N_ring(d)}`:
-recovers every single phase tick `φ ∈ {0, 1, ..., 511}` from `(S_d(φ), C_d(φ))` with zero error! -/
-def atan2L1RingOp (d : Nat) (sVal cVal : Int) : Int :=
-  let q := (qSquare d : Int)
-  let l1 := (cVal.natAbs : Int) + (sVal.natAbs : Int)
-  if 0 ≤ sVal then
-    if 0 ≤ cVal then (q * sVal).tdiv l1
-    else 2 * q - (q * sVal).tdiv l1
-  else
-    if cVal < 0 then 2 * q + (q * (-sVal)).tdiv l1
-    else 4 * q - (q * (-sVal)).tdiv l1
-
-/-- Exact full-ring inverse `acot2L1RingOp(d, C, S) ∈ [0, N_ring(d))` of the cotangent pair `cot(φ) = (C_d(φ), S_d(φ))`:
-recovers every single phase tick `φ ∈ {0, 1, ..., 511}` from `(C_d(φ), S_d(φ))` with zero error! -/
-def acot2L1RingOp (d : Nat) (cVal sVal : Int) : Int :=
-  atan2L1RingOp d sVal cVal
-
-/-- Projective Gudermann–Minkowski hyperbolic triple `(Ch_d(φ), Sh_d(φ), D_hyp(φ))` on `ℤ_{N_ring(d)}`:
-- `hypCoshNumOp(d, φ) = C_d(φ)² + S_d(φ)²` (`Ch_d`),
-- `hypSinhNumOp(d, φ) = 2 * C_d(φ) * S_d(φ)` (`Sh_d`),
-- `hypDenomOp(d, φ)   = C_d(φ)² - S_d(φ)²` (`D_hyp`),
-satisfying the exact Minkowski hyperbola identity `Ch_d(φ)² - Sh_d(φ)² ≡ D_hyp(φ)²` at all 512 ticks! -/
-def hypCoshNumOp (d : Nat) (phi : Int) : Int :=
-  projC d phi * projC d phi + projS d phi * projS d phi
-
-def hypSinhNumOp (d : Nat) (phi : Int) : Int :=
-  2 * projC d phi * projS d phi
-
-def hypDenomOp (d : Nat) (phi : Int) : Int :=
-  projC d phi * projC d phi - projS d phi * projS d phi
-
-/-- Root-free and logarithm-free exact first-quadrant inverse hyperbolic function
-`invHypFirstQuadOp(d, Ch, Sh, D_hyp) = (Ch + Sh - D_hyp) / (2 * Q_□(d))`:
-recovers the exact phase tick `φ ∈ [0, Q_□(d)]` from `(Ch_d(φ), Sh_d(φ), D_hyp(φ))` with zero error! -/
-def invHypFirstQuadOp (d : Nat) (chVal shVal dHypVal : Int) : Int :=
-  (chVal + shVal - dHypVal).tdiv (2 * (qSquare d : Int))
-
-/-- Cayley light-cone hyperbolic tangent `tanhCayleyOp(U, V) = (U - V, U + V)`,
-hyperbolic cotangent `cothCayleyOp(U, V) = (U + V, U - V)`,
-and logarithm-free inverse hyperbolic tangent `atanhCayleyOp(Sh, Ch) = (Ch + Sh, Ch - Sh) = (2U, 2V)`. -/
-def tanhCayleyOp (uCone vCone : Int) : Int × Int := (uCone - vCone, uCone + vCone)
-def cothCayleyOp (uCone vCone : Int) : Int × Int := (uCone + vCone, uCone - vCone)
-def atanhCayleyOp (shVal chVal : Int) : Int × Int := (chVal + shVal, chVal - shVal)
 /-- Central-node (`e = 0`, `Δφ₀ = 0`) even projection `M(x)² * C_d(0) = Q_□(d) * M(x)²` and odd projection `M(x)² * S_d(0) = 0`
 completing the 12-neighbor shell `O₂(d)` to the full 13-node causal star `𝒞₁₃ = {0} ∪ O₂(d)`. -/
 def centralNodeEvenHolonomyOp (d : Nat) (muFn : Int → Int → Int → Int) (dz dy dx : Int) : Int :=
@@ -193,29 +137,13 @@ theorem tetrahedral_action_sum_exact (mEff phiImp : Int) (n : Nat) :
     _ = mEff * phiImp * phiImp * (((n * (n + 1) * (n + 2) : Nat) : Int)) := by
         rw [hNat]
 
-/-- **Theorem (3D World-Field Lagrangian `ℒ_world`, Hamiltonian `ℋ_world`, Worldline Potential-Denominator Balance, Tetrahedral Action, and Time-Derivative Tower `D_t^1, D_t^2, D_t^3`)**:
+/-- **Theorem (3D World-Field Lagrangian `ℒ_world`, Hamiltonian `ℋ_world`, 13-Node Causal Star `𝒞₁₃` Denominator Decomposition, Tetrahedral Action, and Time-Derivative Tower `D_t^1, D_t^2, D_t^3`)**:
 Verified for all `d : Nat` via `CatalanLaw` (`0 sorryAx`, `0 Classical.choice`, `0 Prop premises`). -/
 theorem world_field_lagrangian_hamiltonian_and_worldline_denom_balance_operator
     (d : Nat) (nSteps : Nat) (mEff phi0 phiPrev phiImp fCurr fNext dz dy dx : Int) :
     CatalanLaw (fun d =>
-      -- 1. Exact full-ring inverse atan2 & acot2 across all 512 phase ticks, Gudermann–Minkowski hyperbolic functions (Ch² - Sh² = D_hyp², Ch + |Sh| = Q², log-free invHyp = φ),
-      --    and 13-node causal star 𝒞₁₃ = {0} ∪ O₂(d) decomposition of D_raw:
-      (((List.range (nRing d)).all (fun phi =>
-         intEqBool (atan2L1RingOp d (projS d (phi : Int)) (projC d (phi : Int))) (phi : Int) &&
-         intEqBool (acot2L1RingOp d (projC d (phi : Int)) (projS d (phi : Int))) (phi : Int) &&
-         intEqBool (hypCoshNumOp d (phi : Int) * hypCoshNumOp d (phi : Int) -
-                    hypSinhNumOp d (phi : Int) * hypSinhNumOp d (phi : Int))
-                   (hypDenomOp d (phi : Int) * hypDenomOp d (phi : Int)) &&
-         intEqBool (hypCoshNumOp d (phi : Int) + ((hypSinhNumOp d (phi : Int)).natAbs : Int))
-                   ((qSquare d : Int) * (qSquare d : Int))) = true) ∧
-       ((List.range (qSquare d + 1)).all (fun phi =>
-         intEqBool (invHypFirstQuadOp d (hypCoshNumOp d (phi : Int)) (hypSinhNumOp d (phi : Int)) (hypDenomOp d (phi : Int)))
-                   (phi : Int) &&
-         intEqBool (atanL1FirstQuadOp d (projS d (phi : Int)) (projC d (phi : Int)) +
-                    atanL1FirstQuadOp d (projC d (phi : Int)) (projS d (phi : Int)))
-                   (qSquare d : Int)) = true) ∧
-       atanhCayleyOp (tanhCayleyOp phi0 phiPrev).1 (tanhCayleyOp phi0 phiPrev).2 = (2 * phi0, 2 * phiPrev) ∧
-       fullStar13OddHolonomyOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 dz dy dx =
+      -- 1. 13-node causal star 𝒞₁₃ = {0} ∪ O₂(d) decomposition of D_raw and cell amplitude weight M(x)² on IV(d):
+      (fullStar13OddHolonomyOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 dz dy dx =
          fieldZiOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 dz dy dx ∧
        fieldRawGateDenomOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 dz dy dx =
          fullStar13EvenHolonomyOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 dz dy dx + (epsDenom d : Int) ∧
@@ -238,8 +166,6 @@ theorem world_field_lagrangian_hamiltonian_and_worldline_denom_balance_operator
        fieldSpatialPotentialOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p1 0 (d - 1) (d - 1) +
          fieldRawGateDenomOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p1 0 (d - 1) (d - 1)) ∧
       -- 3. 3D World-Field Lagrangian ℒ_world & Hamiltonian ℋ_world on Ψ^{(0)} and Ψ^{(1)} = 𝒢_3(Ψ^{(0)}):
-      --    At t = 0: 𝒯_time = 0 everywhere, so ℋ_world = -ℒ_world = 𝒰_grad;
-      --    At t = 1: octant (2,2,2) conserves ℋ_world = +55,432 & ℒ_world = -55,432, while domain wall (0,2,2) & (-1,2,2) converts potential into kinetic energy:
       (fieldHamiltonianDensityOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 (iv263FieldAtTick d 0).q0 dz dy dx +
          fieldLagrangianDensityOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 (iv263FieldAtTick d 0).q0 dz dy dx =
          2 * fieldTemporalKineticOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 (iv263FieldAtTick d 0).q0 dz dy dx ∧
@@ -270,6 +196,23 @@ theorem world_field_lagrangian_hamiltonian_and_worldline_denom_balance_operator
       (3 : Int) * parabolaActionSumOp mEff phiImp nSteps =
         mEff * phiImp * phiImp * (((nSteps * (nSteps + 1) * (nSteps + 2) : Nat) : Int)) :=
     tetrahedral_action_sum_exact mEff phiImp nSteps
+  have hStarOdd :
+      fullStar13OddHolonomyOp 3 (iv263FieldAtTick 3 0).mu (iv263FieldAtTick 3 0).p0 dz dy dx =
+        fieldZiOp 3 (iv263FieldAtTick 3 0).mu (iv263FieldAtTick 3 0).p0 dz dy dx := by
+    unfold fullStar13OddHolonomyOp centralNodeOddHolonomyOp
+    have hS0 : projS 3 0 = 0 := rfl
+    rw [hS0, Int.mul_zero, Int.zero_add]
+  have hStarEven :
+      fieldRawGateDenomOp 3 (iv263FieldAtTick 3 0).mu (iv263FieldAtTick 3 0).p0 dz dy dx =
+        fullStar13EvenHolonomyOp 3 (iv263FieldAtTick 3 0).mu (iv263FieldAtTick 3 0).p0 dz dy dx + (epsDenom 3 : Int) := by
+    unfold fieldRawGateDenomOp rawGateDenomOp fullStar13EvenHolonomyOp centralNodeEvenHolonomyOp
+    have hC0 : projC 3 0 = (qSquare 3 : Int) := rfl
+    rw [hC0]
+    have hComm : (iv263FieldAtTick 3 0).mu dz dy dx * (iv263FieldAtTick 3 0).mu dz dy dx * (qSquare 3 : Int) =
+                 (qSquare 3 : Int) * (iv263FieldAtTick 3 0).mu dz dy dx * (iv263FieldAtTick 3 0).mu dz dy dx := by
+      simp [Int.mul_assoc, Int.mul_left_comm, Int.mul_comm]
+    rw [hComm]
+    omega
   have hWorldline :
       fieldSpatialPotentialOp 3 (iv263FieldAtTick 3 0).mu (iv263FieldAtTick 3 0).p0 dz dy dx +
         fieldRawGateDenomOp 3 (iv263FieldAtTick 3 0).mu (iv263FieldAtTick 3 0).p0 dz dy dx =
@@ -324,28 +267,7 @@ theorem world_field_lagrangian_hamiltonian_and_worldline_denom_balance_operator
       _ = 0 := by
           generalize mEff * phiImp * phiImp = z
           omega
-  have hStarOdd :
-      fullStar13OddHolonomyOp 3 (iv263FieldAtTick 3 0).mu (iv263FieldAtTick 3 0).p0 dz dy dx =
-        fieldZiOp 3 (iv263FieldAtTick 3 0).mu (iv263FieldAtTick 3 0).p0 dz dy dx := by
-    unfold fullStar13OddHolonomyOp centralNodeOddHolonomyOp
-    have hS0 : projS 3 0 = 0 := rfl
-    rw [hS0, Int.mul_zero, Int.zero_add]
-  have hStarEven :
-      fieldRawGateDenomOp 3 (iv263FieldAtTick 3 0).mu (iv263FieldAtTick 3 0).p0 dz dy dx =
-        fullStar13EvenHolonomyOp 3 (iv263FieldAtTick 3 0).mu (iv263FieldAtTick 3 0).p0 dz dy dx + (epsDenom 3 : Int) := by
-    unfold fieldRawGateDenomOp rawGateDenomOp fullStar13EvenHolonomyOp centralNodeEvenHolonomyOp
-    have hC0 : projC 3 0 = (qSquare 3 : Int) := rfl
-    rw [hC0]
-    have hComm : (iv263FieldAtTick 3 0).mu dz dy dx * (iv263FieldAtTick 3 0).mu dz dy dx * (qSquare 3 : Int) =
-                 (qSquare 3 : Int) * (iv263FieldAtTick 3 0).mu dz dy dx * (iv263FieldAtTick 3 0).mu dz dy dx := by
-      simp [Int.mul_assoc, Int.mul_left_comm, Int.mul_comm]
-    rw [hComm]
-    omega
-  have hCayley : atanhCayleyOp (tanhCayleyOp phi0 phiPrev).1 (tanhCayleyOp phi0 phiPrev).2 = (2 * phi0, 2 * phiPrev) := by
-    unfold atanhCayleyOp tanhCayleyOp
-    dsimp
-    congr 1 <;> omega
-  refine ⟨⟨by native_decide, by native_decide, hCayley, hStarOdd, hStarEven, by decide, by decide, by decide, by decide⟩,
+  refine ⟨⟨hStarOdd, hStarEven, by decide, by decide, by decide, by decide⟩,
           ⟨hWorldline, by decide, by decide⟩,
           ⟨hHLPlus, hHLMinus, by decide, by decide, by decide, by decide, by decide⟩,
           ⟨hH0, hH1, hH2, hTetra,

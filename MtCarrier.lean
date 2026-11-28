@@ -1,8 +1,7 @@
 import MtCarrier.Spec
 import MtCarrier.FaceAlgebra
 import MtCarrier.HolonomyMaxwell
-import MtCarrier.TrajectoryIV263
+import MtCarrier.PolarVerletParabola
+import MtCarrier.WorldTrajectory
 import MtCarrier.UnifiedOperators
-import MtCarrier.AxiomAudit
 import RotatorCalculusPaper
-

@@ -3,6 +3,7 @@ import MtCarrier.CosmologyHalo
 import MtCarrier.ChemicalBonding
 import MtCarrier.OntogenyMutagenesis
 import MtCarrier.PlanetogenesisAllometry
+import MtCarrier.MendeleevPeriodicTable
 import MtCarrier.NuclearShells
 import MtCarrier.ParticleSpectrum
 import MtCarrier.SuperconductorBioCad
@@ -10,3 +11,4 @@ import MtCarrier.ReversibleComputing
 import MtCarrier.RotatorQuadratureCarrier
 import MtCarrier.HardwarePhotovoltaics
 import MtCarrier.MechanicsElasticity
+import MtCarrier.LagrangianHamiltonian

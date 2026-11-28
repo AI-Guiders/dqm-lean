@@ -1,4 +1,4 @@
-import MtCarrier.TrajectoryIV263
+import MtCarrier.WorldTrajectory
 
 /-!
 # Bridge Executable `mt_carrier_dump`: Lean 4 ↔ Python (`mt_ca/carrier_core.py`) JSON Diff

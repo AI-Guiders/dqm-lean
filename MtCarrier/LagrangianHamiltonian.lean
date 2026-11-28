@@ -4,15 +4,15 @@ set_option maxRecDepth 200000
 set_option maxHeartbeats 1000000
 
 /-!
-# World-Field Lagrangian `ℒ_world`, Hamiltonian `ℋ_world`, Worldline Potential-Impedance Balance, and Time-Derivative Tower (`D_t^1, D_t^2, D_t^3`) (`0 sorryAx`, `0 Classical.choice`, `0 Prop premises`)
+# World-Field Lagrangian `ℒ_world`, Hamiltonian `ℋ_world`, Worldline Potential-Denominator Balance, and Time-Derivative Tower (`D_t^1, D_t^2, D_t^3`) (`0 sorryAx`, `0 Classical.choice`, `0 Prop premises`)
 
 This module formalizes the 3D World-Field Lagrangian and Hamiltonian densities
 along the 3D world evolution operator `Ψ^{(t+1)} = 𝒢_d(Ψ^{(t)})` (`fieldStepOp d` in `WorldTrajectory.lean`),
-together with the local amplitude weight `M(x)² ∈ [1, 4096]`, the gate impedance denominator `D_raw(x, t)`, and the time-derivative tower:
-1. **Cell Amplitude Weight (`M(x)² ∈ [1, 4096]`) and Gate Impedance Denominator `D_raw(x, t)`:**
+together with the local amplitude weight `M(x)² ∈ [1, 4096]`, the gate denominator `D_raw(x, t)`, and the time-derivative tower:
+1. **Cell Amplitude Weight (`M(x)² ∈ [1, 4096]`) and Gate Denominator `D_raw(x, t)`:**
    - At any 3D lattice point `x = (dz, dy, dx) ∈ ℤ³`, a cell has amplitude `M(x) = s.mu(dz, dy, dx)` (equal to `μ_vac(3) = 1` in empty vacuum outside the radius-6 ball e.g. `(7,0,0)`,
      `N_φ(3) = 13` inside the `IV(3)` nucleation ball e.g. `(2,2,2)` where `M(x)² = 169`, and up to `K_P(3) = 64` where `M(x)² = 4,096`).
-   - Its raw gate impedance denominator in `D_t^2 φ = ⌊K_P * z_drive / D_c(x)⌋` is
+   - Its raw gate denominator in `D_t^2 φ = ⌊K_P * z_drive / D_c(x)⌋` is
      `D_raw,c(Ψ)(x) = 𝒵_real,c(Ψ)(x) + Q_□(d) * M(x)² + ε(d)`.
 2. **3D World-Field Lagrangian `ℒ_world` & Hamiltonian `ℋ_world` Densities:**
    - Temporal kinetic energy density weighted by `M(x)²`:
@@ -21,9 +21,9 @@ together with the local amplitude weight `M(x)² ∈ [1, 4096]`, the gate impeda
      `𝒰_grad,c(Ψ)(x) = Q_□(d) * M(x) * Σ_μ(x) - 𝒵_real,c(Ψ)(x) ≥ 0`.
    - World-Field Lagrangian density `ℒ_world,c(Ψ)(x) = 𝒯_time,c(Ψ)(x) - 𝒰_grad,c(Ψ)(x)` and
      World-Field Hamiltonian density `ℋ_world,c(Ψ)(x) = 𝒯_time,c(Ψ)(x) + 𝒰_grad,c(Ψ)(x)`.
-3. **Worldline Potential-Impedance Balance (`𝒰_grad(x, t) + D_raw(x, t) ≡ const(t)`):**
+3. **Worldline Potential-Denominator Balance (`𝒰_grad(x, t) + D_raw(x, t) ≡ const(t)`):**
    - At every spatial node `x ∈ ℤ³` and across all time ticks `t ∈ ℕ` of the 3D world evolution `Ψ^{(t)} = 𝒢_d^[t](Ψ^{(0)})`,
-     the sum of the 12-ray gradient potential `𝒰_grad,c` and the raw gate impedance denominator `D_raw,c` is
+     the sum of the 12-ray gradient potential `𝒰_grad,c` and the raw gate denominator `D_raw,c` is
      strictly independent of the phase fields `P_c, Q_c` and strictly invariant in time:
      `𝒰_grad,c(Ψ^{(t)})(x) + D_raw,c(Ψ^{(t)})(x) ≡ Q_□(d) * M(x) * (Σ_μ(x) + M(x)) + ε(d)`.
 4. **Mass-Weighted Closed-Form Parabola Hamiltonian `ℋ_parab(t) ≡ 0`, Tetrahedral Action `3 * ∑_{t=0}^N ℒ_parab(t) = M_eff * Φ₀² * N(N+1)(N+2)`, and Time-Derivative Tower (`D_t^1, D_t^2, D_t^3`):**
@@ -50,7 +50,7 @@ def fieldTemporalKineticOp (d : Nat) (muFn pFn qFn : Int → Int → Int → Int
 def fieldSpatialPotentialOp (d : Nat) (muFn pFn : Int → Int → Int → Int) (dz dy dx : Int) : Int :=
   gateDeficitOp d (muFn dz dy dx) (fieldSumMuOp d muFn dz dy dx) (fieldZrOp d muFn pFn dz dy dx)
 
-/-- 3D World-Field raw gate impedance denominator `D_raw(d, M, P)(x) = 𝒵_real(d, M, P)(x) + Q_□(d) * M(x)² + ε(d)`. -/
+/-- 3D World-Field raw gate denominator `D_raw(d, M, P)(x) = 𝒵_real(d, M, P)(x) + Q_□(d) * M(x)² + ε(d)`. -/
 def fieldRawGateDenomOp (d : Nat) (muFn pFn : Int → Int → Int → Int) (dz dy dx : Int) : Int :=
   rawGateDenomOp d (muFn dz dy dx) (fieldZrOp d muFn pFn dz dy dx)
 
@@ -127,18 +127,18 @@ theorem tetrahedral_action_sum_exact (mEff phiImp : Int) (n : Nat) :
     _ = mEff * phiImp * phiImp * (((n * (n + 1) * (n + 2) : Nat) : Int)) := by
         rw [hNat]
 
-/-- **Theorem (3D World-Field Lagrangian `ℒ_world`, Hamiltonian `ℋ_world`, Worldline Potential-Impedance Balance, Tetrahedral Action, and Time-Derivative Tower `D_t^1, D_t^2, D_t^3`)**:
+/-- **Theorem (3D World-Field Lagrangian `ℒ_world`, Hamiltonian `ℋ_world`, Worldline Potential-Denominator Balance, Tetrahedral Action, and Time-Derivative Tower `D_t^1, D_t^2, D_t^3`)**:
 Verified for all `d : Nat` via `CatalanLaw` (`0 sorryAx`, `0 Classical.choice`, `0 Prop premises`). -/
-theorem world_field_lagrangian_hamiltonian_and_worldline_impedance_balance_operator
+theorem world_field_lagrangian_hamiltonian_and_worldline_denom_balance_operator
     (d : Nat) (nSteps : Nat) (mEff phi0 phiPrev phiImp fCurr fNext dz dy dx : Int) :
     CatalanLaw (fun d =>
-      -- 1. Cell amplitude weight M(x)² and gate impedance denominator D_raw(x) on IV(d):
+      -- 1. Cell amplitude weight M(x)² and gate denominator D_raw(x) on IV(d):
       --    Empty vacuum outside radius 6 (7,0,0) has M = 1, whereas nucleation core (2,2,2) has M = 13 = N_φ(3) (M² = 169, D_raw = 233,976):
       ((iv263FieldAtTick d 0).mu 7 0 0 = (muVac d : Int) ∧
        (iv263FieldAtTick d 0).mu (d - 1) (d - 1) (d - 1) = (nPhi d : Int) ∧
        (iv263FieldAtTick d 0).mu (d - 1) (d - 1) (d - 1) * (iv263FieldAtTick d 0).mu (d - 1) (d - 1) (d - 1) = 169 ∧
        fieldRawGateDenomOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 (d - 1) (d - 1) (d - 1) = 233976) ∧
-      -- 2. Universal Worldline Potential-Impedance Balance at every 3D point (dz, dy, dx) ∈ ℤ³:
+      -- 2. Universal Worldline Potential-Denominator Balance at every 3D point (dz, dy, dx) ∈ ℤ³:
       --    𝒰_grad(x, t) + D_raw(x, t) ≡ Q_□(d) * M(x) * (Σ_μ(x) + M(x)) + ε(d) is independent of phase evolution t = 0 -> t = 1 -> t = 2:
       (fieldSpatialPotentialOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 dz dy dx +
          fieldRawGateDenomOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 dz dy dx =

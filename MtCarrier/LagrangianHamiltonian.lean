@@ -50,7 +50,42 @@ def fieldTemporalKineticOp (d : Nat) (muFn pFn qFn : Int → Int → Int → Int
 def fieldSpatialPotentialOp (d : Nat) (muFn pFn : Int → Int → Int → Int) (dz dy dx : Int) : Int :=
   gateDeficitOp d (muFn dz dy dx) (fieldSumMuOp d muFn dz dy dx) (fieldZrOp d muFn pFn dz dy dx)
 
-/-- 3D World-Field raw gate denominator `D_raw(d, M, P)(x) = 𝒵_real(d, M, P)(x) + Q_□(d) * M(x)² + ε(d)`. -/
+/-- Exact first-quadrant inverse `atanL1FirstQuadOp(d, S, C) = (Q_□(d) * S) / (|C| + |S|)` of `(C_d(φ), S_d(φ))` on the `L¹` diamond:
+recovers `φ` with **zero approximation error** for every `φ ∈ [0, Q_□(d)]` and any positive homogeneous scaling `λ ≥ 1`. -/
+def atanL1FirstQuadOp (d : Nat) (sVal cVal : Int) : Int :=
+  ((qSquare d : Int) * sVal).tdiv ((cVal.natAbs : Int) + (sVal.natAbs : Int))
+
+/-- Exact full-ring inverse `atan2L1RingOp(d, S, C) ∈ [0, N_ring(d))` of `(C_d(φ), S_d(φ))` across all 4 quadrants of `ℤ_{N_ring(d)}`:
+recovers every single phase tick `φ ∈ {0, 1, ..., 511}` from `(S_d(φ), C_d(φ))` with zero error! -/
+def atan2L1RingOp (d : Nat) (sVal cVal : Int) : Int :=
+  let q := (qSquare d : Int)
+  let l1 := (cVal.natAbs : Int) + (sVal.natAbs : Int)
+  if 0 ≤ sVal then
+    if 0 ≤ cVal then (q * sVal).tdiv l1
+    else 2 * q - (q * sVal).tdiv l1
+  else
+    if cVal < 0 then 2 * q + (q * (-sVal)).tdiv l1
+    else 4 * q - (q * (-sVal)).tdiv l1
+
+/-- Central-node (`e = 0`, `Δφ₀ = 0`) even projection `M(x)² * C_d(0) = Q_□(d) * M(x)²` and odd projection `M(x)² * S_d(0) = 0`
+completing the 12-neighbor shell `O₂(d)` to the full 13-node causal star `𝒞₁₃ = {0} ∪ O₂(d)`. -/
+def centralNodeEvenHolonomyOp (d : Nat) (muFn : Int → Int → Int → Int) (dz dy dx : Int) : Int :=
+  let m := muFn dz dy dx
+  m * m * projC d 0
+
+def centralNodeOddHolonomyOp (d : Nat) (muFn : Int → Int → Int → Int) (dz dy dx : Int) : Int :=
+  let m := muFn dz dy dx
+  m * m * projS d 0
+
+/-- Full 13-node causal star `𝒞₁₃ = {0} ∪ O₂(d)` even holonomy `𝒵_real^{𝒞₁₃}(x) = M(x)² * C_d(0) + 𝒵_real^{O₂}(x)`. -/
+def fullStar13EvenHolonomyOp (d : Nat) (muFn pFn : Int → Int → Int → Int) (dz dy dx : Int) : Int :=
+  centralNodeEvenHolonomyOp d muFn dz dy dx + fieldZrOp d muFn pFn dz dy dx
+
+/-- Full 13-node causal star `𝒞₁₃ = {0} ∪ O₂(d)` odd holonomy `𝒵_imag^{𝒞₁₃}(x) = M(x)² * S_d(0) + 𝒵_imag^{O₂}(x) ≡ 𝒵_imag^{O₂}(x)`. -/
+def fullStar13OddHolonomyOp (d : Nat) (muFn pFn : Int → Int → Int → Int) (dz dy dx : Int) : Int :=
+  centralNodeOddHolonomyOp d muFn dz dy dx + fieldZiOp d muFn pFn dz dy dx
+
+/-- 3D World-Field raw gate denominator `D_raw(d, M, P)(x) = 𝒵_real^{𝒞₁₃}(x) + ε(d) = 𝒵_real(d, M, P)(x) + Q_□(d) * M(x)² + ε(d)`. -/
 def fieldRawGateDenomOp (d : Nat) (muFn pFn : Int → Int → Int → Int) (dz dy dx : Int) : Int :=
   rawGateDenomOp d (muFn dz dy dx) (fieldZrOp d muFn pFn dz dy dx)
 
@@ -132,9 +167,14 @@ Verified for all `d : Nat` via `CatalanLaw` (`0 sorryAx`, `0 Classical.choice`, 
 theorem world_field_lagrangian_hamiltonian_and_worldline_denom_balance_operator
     (d : Nat) (nSteps : Nat) (mEff phi0 phiPrev phiImp fCurr fNext dz dy dx : Int) :
     CatalanLaw (fun d =>
-      -- 1. Cell amplitude weight M(x)² and gate denominator D_raw(x) on IV(d):
-      --    Empty vacuum outside radius 6 (7,0,0) has M = 1, whereas nucleation core (2,2,2) has M = 13 = N_φ(3) (M² = 169, D_raw = 233,976):
-      ((iv263FieldAtTick d 0).mu 7 0 0 = (muVac d : Int) ∧
+      -- 1. Exact full-ring inverse atan2L1RingOp(S_d(φ), C_d(φ)) = φ across all 512 phase ticks & 13-node causal star 𝒞₁₃ = {0} ∪ O₂(d) decomposition of D_raw:
+      (((List.range (nRing d)).all (fun phi =>
+         intEqBool (atan2L1RingOp d (projS d (phi : Int)) (projC d (phi : Int))) (phi : Int)) = true) ∧
+       fullStar13OddHolonomyOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 dz dy dx =
+         fieldZiOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 dz dy dx ∧
+       fieldRawGateDenomOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 dz dy dx =
+         fullStar13EvenHolonomyOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 dz dy dx + (epsDenom d : Int) ∧
+       (iv263FieldAtTick d 0).mu 7 0 0 = (muVac d : Int) ∧
        (iv263FieldAtTick d 0).mu (d - 1) (d - 1) (d - 1) = (nPhi d : Int) ∧
        (iv263FieldAtTick d 0).mu (d - 1) (d - 1) (d - 1) * (iv263FieldAtTick d 0).mu (d - 1) (d - 1) (d - 1) = 169 ∧
        fieldRawGateDenomOp d (iv263FieldAtTick d 0).mu (iv263FieldAtTick d 0).p0 (d - 1) (d - 1) (d - 1) = 233976) ∧
@@ -239,7 +279,24 @@ theorem world_field_lagrangian_hamiltonian_and_worldline_denom_balance_operator
       _ = 0 := by
           generalize mEff * phiImp * phiImp = z
           omega
-  refine ⟨⟨by decide, by decide, by decide, by decide⟩,
+  have hStarOdd :
+      fullStar13OddHolonomyOp 3 (iv263FieldAtTick 3 0).mu (iv263FieldAtTick 3 0).p0 dz dy dx =
+        fieldZiOp 3 (iv263FieldAtTick 3 0).mu (iv263FieldAtTick 3 0).p0 dz dy dx := by
+    unfold fullStar13OddHolonomyOp centralNodeOddHolonomyOp
+    have hS0 : projS 3 0 = 0 := rfl
+    rw [hS0, Int.mul_zero, Int.zero_add]
+  have hStarEven :
+      fieldRawGateDenomOp 3 (iv263FieldAtTick 3 0).mu (iv263FieldAtTick 3 0).p0 dz dy dx =
+        fullStar13EvenHolonomyOp 3 (iv263FieldAtTick 3 0).mu (iv263FieldAtTick 3 0).p0 dz dy dx + (epsDenom 3 : Int) := by
+    unfold fieldRawGateDenomOp rawGateDenomOp fullStar13EvenHolonomyOp centralNodeEvenHolonomyOp
+    have hC0 : projC 3 0 = (qSquare 3 : Int) := rfl
+    rw [hC0]
+    have hComm : (iv263FieldAtTick 3 0).mu dz dy dx * (iv263FieldAtTick 3 0).mu dz dy dx * (qSquare 3 : Int) =
+                 (qSquare 3 : Int) * (iv263FieldAtTick 3 0).mu dz dy dx * (iv263FieldAtTick 3 0).mu dz dy dx := by
+      simp [Int.mul_assoc, Int.mul_left_comm, Int.mul_comm]
+    rw [hComm]
+    omega
+  refine ⟨⟨by native_decide, hStarOdd, hStarEven, by decide, by decide, by decide, by decide⟩,
           ⟨hWorldline, by decide, by decide⟩,
           ⟨hHLPlus, hHLMinus, by decide, by decide, by decide, by decide, by decide⟩,
           ⟨hH0, hH1, hH2, hTetra,

@@ -11,13 +11,18 @@ require mathlib from git
 lean_lib «ConstructiveCore» where
   srcDir := "../Constructive"
   roots := #[
+    `AxiomGuard,
     `RotatorQuadrature,
+    `ProjectiveFieldCalculus,
+    `InverseTrigHyperbolic,
     `LogicCohomology,
     `PillaiDiophantine,
     `AbcPlanetaryWronskian,
     `ModelTheoreticLimit,
     `CollatzPlanetarySplice,
-    `RiemannHolonomy
+    `CollatzGearMonoid,
+    `RiemannHolonomy,
+    `MinkowskiCounterwaveCascade
   ]
 
 /-- Contour 2: Standard `mathlib4` interoperability bridge (where classical `Mathlib` definitions live). -/

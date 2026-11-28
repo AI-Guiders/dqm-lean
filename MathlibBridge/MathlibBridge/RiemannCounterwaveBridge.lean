@@ -7,7 +7,7 @@
   to standard `mathlib4` definitions (`RiemannHypothesis`, `RobinInequality`, `Complex`).
 -/
 
-import RiemannHolonomy
+import MinkowskiCounterwaveCascade
 
 namespace DqmMathlibBridge
 
